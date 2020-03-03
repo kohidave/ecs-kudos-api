@@ -20,9 +20,9 @@ func CreateContribution(w http.ResponseWriter, req *http.Request, ps httprouter.
 
 	kudosService := NewKudosService(awsSess)
 
-	payload, err := github.ValidatePayload(req, []byte(os.Getenv("WEBHOOK-SECRET")))
+	payload, err := github.ValidatePayload(req, []byte(os.Getenv("WEBHOOK_SECRET")))
 	if err != nil {
-		log.Printf("error validating request body: err=%s\n", err)
+		log.Printf("🚨 error validating request body: err=%s\n", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -30,7 +30,7 @@ func CreateContribution(w http.ResponseWriter, req *http.Request, ps httprouter.
 
 	event, err := github.ParseWebHook(github.WebHookType(req), payload)
 	if err != nil {
-		log.Printf("could not parse webhook: err=%s\n", err)
+		log.Printf("🚨 error could not parse webhook: err=%s\n", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -41,18 +41,19 @@ func CreateContribution(w http.ResponseWriter, req *http.Request, ps httprouter.
 			w.WriteHeader(http.StatusAccepted)
 			return
 		}
-		req := &Kudo{
+		kudoRequest := &Kudo{
 			User:             e.GetPullRequest().GetUser().GetLogin(),
 			Time:             e.GetPullRequest().GetCreatedAt(),
 			ContributionType: "PullRequest",
-			ContributionURL:  e.GetPullRequest().GetURL(),
+			ContributionURL:  e.GetPullRequest().GetHTMLURL(),
 			ContributionName: e.GetPullRequest().GetTitle(),
 		}
-		if err := kudosService.CreateKudo(req); err != nil {
+		if err := kudosService.CreateKudo(kudoRequest); err != nil {
 			log.Printf("🚨 could create kudo: err=%s\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		log.Printf("✅ saved pull-request kudo for user %s\n", kudoRequest.User)
 		w.WriteHeader(http.StatusCreated)
 		return
 	case *github.IssuesEvent:
@@ -60,18 +61,19 @@ func CreateContribution(w http.ResponseWriter, req *http.Request, ps httprouter.
 			w.WriteHeader(http.StatusAccepted)
 			return
 		}
-		req := &Kudo{
+		kudoRequest := &Kudo{
 			User:             e.GetIssue().GetUser().GetLogin(),
 			Time:             e.GetIssue().GetCreatedAt(),
 			ContributionType: "Issue",
-			ContributionURL:  e.GetIssue().GetURL(),
+			ContributionURL:  e.GetIssue().GetHTMLURL(),
 			ContributionName: e.GetIssue().GetTitle(),
 		}
-		if err := kudosService.CreateKudo(req); err != nil {
-			log.Printf("🚨 could create kudo: err=%s\n", err)
+		if err := kudosService.CreateKudo(kudoRequest); err != nil {
+			log.Printf("🚨 error could create kudo: err=%s\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		log.Printf("✅ saved issue kudo for user %s\n", kudoRequest.User)
 		w.WriteHeader(http.StatusCreated)
 		return
 	default:

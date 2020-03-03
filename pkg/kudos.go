@@ -13,10 +13,10 @@ import (
 // KudosTableNamePrefix pattern for our ddb table
 const KudosTableNamePrefix = "ecskudos-%s-%s"
 
-// Kudo is a struct representing a kudo
+// Kudo is a struct representing a users kudo
 type Kudo struct {
 	User             string
-	Time             time.Time
+	Time             time.Time `dynamodbav:",unixtime"`
 	ContributionType string
 	ContributionURL  string
 	ContributionName string
