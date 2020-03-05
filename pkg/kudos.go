@@ -11,7 +11,7 @@ import (
 )
 
 // KudosTableNamePrefix pattern for our ddb table
-const KudosTableNamePrefix = "ecskudos-%s-%s"
+const KudosTableNamePrefix = "ecs-kudos-%s-%s"
 
 // Kudo is a struct representing a users kudo
 type Kudo struct {
