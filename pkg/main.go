@@ -105,6 +105,7 @@ func GetKudosForUser(w http.ResponseWriter, req *http.Request, ps httprouter.Par
 
 // HealthCheck just returns true if the service is up.
 func HealthCheck(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	log.Println("🚑 healthcheck ok!")
 	w.WriteHeader(http.StatusOK)
 }
 
