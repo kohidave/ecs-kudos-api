@@ -32,7 +32,7 @@ type KudosService struct {
 func NewKudosService(sess *session.Session) *KudosService {
 	return &KudosService{
 		dynamo:    dynamodb.New(sess),
-		tableName: fmt.Sprintf(KudosTableNamePrefix, "test", "kudos"),
+		tableName: fmt.Sprintf(KudosTableNamePrefix, "rad-table", "kudos"),
 	}
 }
 
