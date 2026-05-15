@@ -1,6 +1,6 @@
 # We specify the base image we need for our
 # go application
-FROM golang:1.13-buster as build
+FROM golang:1.22-bookworm as build
 # We create an /app directory within our
 # image that will hold our application source
 # files
@@ -20,7 +20,7 @@ RUN go build -o kudos-api ./pkg
 # our newly created binary executable
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/base-debian10
+FROM gcr.io/distroless/base-debian12
 COPY --from=build /app/kudos-api /
 
 CMD ["/kudos-api"]
